@@ -1,184 +1,130 @@
-/// frisrt local affter add this code   imp
+let cards = JSON.parse(localStorage.getItem('cards')||[])
 
+function saveCards(){
+    localStorage.setItem('cards',JSON.stringify(cards))
+}  
 
-// let container =document.querySelector("#container")
+let Nav =document.querySelector('nav')
+let sections =document.querySelector('section')
+ let inputvalue = document.querySelector('.inputvalue')
 
- 
-// container.addEventListener('click',function(e){
-//    let curantclick=`${e.target.innerText} clicked` 
-//   if(e.target.tagName==='BUTTON'){
-//       console.log(curantclick)
-//   }
-  
-// })
+ function rendeCards(){
+      sections.innerHTML=''
+    
+      cards.forEach(card => {
+         let div =document.createElement('div')
+         div.className='Card'
+         div.dataset.id= card.id
+           let h1 =document.createElement('h1')
+           h1.innerHTML= card.text
+        let btn =document.createElement("button")
+        btn.innerHTML='Delete' 
+         
+        sections.appendChild(div)
+        div.appendChild(h1)
+        div.appendChild(btn)
+        
+      });
+     
+ }
 
+ rendeCards()
 
+Nav.addEventListener('click',function(e){
 
+   if(e.target.tagName==='BUTTON' && inputvalue.value.trim() ){
+   
+    let NewCard ={
+        id:Date.now(),
+        text:inputvalue.value
+      }
+    
+     let div =document.createElement('div')
+    div.className='Card'
+      div.dataset.id =NewCard.id
+   
+    let h1 =document.createElement('h1')
+    
+      h1.innerHTML=inputvalue.value
+      let btn =document.createElement("button")
+      btn.innerHTML='Delete'
+    
+    
 
+    sections.appendChild(div)
+    div.appendChild(h1)
+    div.append(btn)
 
-
-
-
-// function createdTodo(){
-
-//   let todos = JSON.parse(localStorage.getItem("todos")) || []
-
-// function saveTodos() {
-//   localStorage.setItem("todos", JSON.stringify(todos))
-// }
-
-// let box =document.querySelector('.box')
-// let todoTask=document.querySelector('#todoInput')
-// let todoList =document.querySelector("#todoList")  
-
-
-//   function renderTodos() {
-//   todoList.innerHTML = ""
-
-//   todos.forEach(todo => {
-//     let li = document.createElement("li")
-//     li.dataset.id = todo.id
-
-//     if (todo.completed) {
-//       li.classList.add("completed")
-//     }
-
-//     li.innerHTML = `
-//       <span>${todo.text}</span>
-//       <button>Delete</button>
-//     `
-
-//     todoList.appendChild(li)
-//   })
-// }
-
-// renderTodos()
-
-
-
-// box.addEventListener('click',function(e){
-//     if(e.target.tagName==="BUTTON" && todoTask.value.trim()){
-//      console.log(todoTask.value)
-//      const newLi = document.createElement('li')
-//      const newspna =document.createElement('span')
-//      newspna.innerHTML= todoTask.value
-//      const newBtn =document.createElement('button')
-//      newBtn.innerHTML='Delete'
-
-//      todoList.appendChild(newLi)
-//      newLi.appendChild(newspna)
-//      newLi.appendChild(newBtn)
       
-//      let newTodo = {
-//     id: Date.now(),
-//     text: todoTask.value,
-//     completed: false
-//   }
+      
+    cards.push(NewCard)
+      saveCards()
 
-//     todos.push(newTodo)
+   }
+    inputvalue.value=''
+})
+
+sections.addEventListener('click', function (e) {
+   
+      let card =e.target.closest(".Card")
+      if(!card) return
+    sections.querySelectorAll('.Card').forEach(function(c){
+  c.classList.remove('Active')
+})
+
+card.classList.add('Active')
+
+      
     
-//      saveTodos()
-//     renderTodos()
     
+    if(e.target.tagName==="BUTTON"){ 
 
-//     } 
-//     todoTask.value = ""
-// })
+        let cardDiv= e.target.closest('.Card')
+         let id =Number(cardDiv.dataset.id)
 
+      cards = cards.filter(function(card){return  card.id !==id})
 
+    saveCards()
+    rendeCards()
+    }
+  if (e.target.tagName === 'H1') {
 
+  let h1 = e.target
+  let cardDiv = h1.closest('.Card')
+  let id = Number(cardDiv.dataset.id)
 
-// todoList.addEventListener("click", function (e) {
-//   let li = e.target.closest("li")
-//   if (!li) return
+  h1.style.display = 'none'
 
-//   let id = Number(li.dataset.id)
+  let input = document.createElement('input')
+  input.type = 'text'
+  input.value = h1.innerText
 
-//   // DELETE
-//   if (e.target.tagName === "BUTTON") {
-//     todos = todos.filter(todo => todo.id !== id)
-//   }
+  cardDiv.appendChild(input)
+  
 
-//   // TOGGLE COMPLETE
-//   if (e.target.tagName === "SPAN") {
-//     todos = todos.map(todo =>
-//       todo.id === id
-//         ? { ...todo, completed: !todo.completed }
-//         : todo
-//     )
-//   }
+  input.addEventListener("keydown", function (e) {
 
-//   saveTodos()
-//   renderTodos()
-// })
-// }
-// createdTodo()
+    if (e.key === "Enter") {
 
-let todos = JSON.parse(localStorage.getItem('todos') ) || []
-function saveTodos(){
-  localStorage.setItem('todos',JSON.stringify(todos))
-}
+      let newText = input.value.trim()
+      if (!newText) return
 
-let box =document.querySelector('.box')
-let inputtodo =document.querySelector('#todoInput')
-let todoList =document.querySelector('#todoList')
-
-
-function renderTodos(){
-  todoList.innerHTML=''
-  todos.forEach(function(todo){
-     let li =document.createElement('li')
-     li.dataset.id=todo.id
     
-     li.innerHTML= 
-     `<span>${todo.text} </sapm>
-       <button>Delete</button>
-     `
-   todoList.appendChild(li)
+      cards = cards.map(card =>
+        card.id === id ? { ...card, text: newText } : card
+      )
+
+      saveCards()
+      rendeCards()
+    }
 
   })
+
 }
-renderTodos()
 
-box.addEventListener('click',function(e){
-  // if(e.target.tegName==="BUTTON"){
-  
-  if(e.target.tagName=='BUTTON'&& inputtodo.value.trim()){
-    console.log(inputtodo.value)
-    let li =document.createElement('li')
-    let span =document.createElement('span')
-    span.innerHTML=inputtodo.value
-    let btn =document.createElement('button')
-        btn.innerHTML="Delete"    
-
-    todoList.appendChild(li)
-    li.appendChild(span)
-    li.appendChild(btn)
- 
-    let newtodo = {
-    id:Date.now(),
-    text:inputtodo.value,
-    completed:false
-   }
-    todos.push(newtodo)
-    saveTodos()
-    renderTodos()
-
-  }
-  
-  inputtodo.value=''
-  // }
+    
+   
 })
 
-todoList.addEventListener("click",function(e){
- let li =e.target.closest('li')
- if(!li) return
- let id =Number(li.dataset.id)
-  console.log(id)
- if(e.target.tagName==="BUTTON"){
-  todos=todos.filter(function(todo){ return todo.id !==id})   
 
- }
-   saveTodos()
-  renderTodos()
-})
+
